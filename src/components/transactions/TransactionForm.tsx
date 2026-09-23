@@ -21,7 +21,6 @@ interface FormErrors {
 }
 
 const MAX_RECEIPT_SIZE_BYTES = 10 * 1024 * 1024
-const ACCEPTED_RECEIPT_TYPES = /^image\/.*|application\/pdf$/
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
@@ -73,11 +72,6 @@ export function TransactionForm({
     if (!selected) {
       setFile(null)
       setErrors((prev) => ({ ...prev, receipt: undefined }))
-      return
-    }
-    if (!ACCEPTED_RECEIPT_TYPES.test(selected.type)) {
-      setFile(null)
-      setErrors((prev) => ({ ...prev, receipt: 'Only image or PDF receipts are allowed.' }))
       return
     }
     if (selected.size > MAX_RECEIPT_SIZE_BYTES) {
@@ -229,7 +223,6 @@ export function TransactionForm({
           <input
             id="receipt"
             type="file"
-            accept="image/*,application/pdf"
             onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
             className="w-full rounded-lg border border-brand-border bg-white px-3 py-2.5 text-sm text-brand-black file:mr-3 file:rounded-md file:border-0 file:bg-brand-green-light file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-brand-green-dark"
           />
