@@ -1,8 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { LayoutDashboard, ListTree, Receipt, Tags, LogOut } from 'lucide-react'
+import { LayoutDashboard, ListTree, Receipt, Tags } from 'lucide-react'
 import logo from '../../assets/brand/logo.png'
-import { useAuth } from '../../context/AuthContext'
-import { Button } from '../ui/Button'
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -12,12 +10,10 @@ const navItems = [
 ]
 
 export function AppLayout() {
-  const { user, logout } = useAuth()
-
   return (
     <div className="min-h-screen bg-brand-gray">
       <header className="border-b border-brand-border bg-brand-black">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
             <img src={logo} alt="Construction Hub PH" className="h-10 w-10 object-contain" />
             <div className="flex flex-col leading-tight">
@@ -26,13 +22,6 @@ export function AppLayout() {
               </span>
               <span className="text-xs text-brand-green">CONSTRUCTION HUB PH</span>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="hidden text-xs text-neutral-300 sm:inline">{user?.email}</span>
-            <Button variant="secondary" onClick={() => logout()} className="!py-2">
-              <LogOut size={16} />
-              <span className="hidden sm:inline">Sign out</span>
-            </Button>
           </div>
         </div>
         <nav className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 pb-2 sm:px-6">
