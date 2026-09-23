@@ -26,11 +26,18 @@ export const DEFAULT_CATEGORIES: NewCategory[] = [
   { name: 'Misc', type: 'outflow', active: true },
 ]
 
-export function subscribeToCategories(callback: (categories: Category[]) => void) {
+export function subscribeToCategories(
+  callback: (categories: Category[]) => void,
+  onError?: (error: Error) => void,
+) {
   const q = query(categoriesRef, orderBy('name'))
-  return onSnapshot(q, (snapshot) => {
-    callback(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Category))
-  })
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      callback(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Category))
+    },
+    (error) => onError?.(error),
+  )
 }
 
 export async function createCategory(category: NewCategory): Promise<string> {

@@ -16,10 +16,15 @@ export async function getMonthlySummary(monthId: string): Promise<MonthlySummary
 export function subscribeToMonthlySummary(
   monthId: string,
   callback: (summary: MonthlySummary | null) => void,
+  onError?: (error: Error) => void,
 ) {
-  return onSnapshot(summaryDocRef(monthId), (snap) => {
-    callback(snap.exists() ? ({ id: snap.id, ...snap.data() } as MonthlySummary) : null)
-  })
+  return onSnapshot(
+    summaryDocRef(monthId),
+    (snap) => {
+      callback(snap.exists() ? ({ id: snap.id, ...snap.data() } as MonthlySummary) : null)
+    },
+    (error) => onError?.(error),
+  )
 }
 
 export async function generateMonthlySummary(

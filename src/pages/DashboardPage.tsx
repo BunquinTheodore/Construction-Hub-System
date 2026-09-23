@@ -19,13 +19,22 @@ export function DashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
 
   useEffect(() => {
-    const unsubscribeTransactions = subscribeToTransactions((data) => {
-      setTransactions(data)
-      setLoading(false)
+    const unsubscribeTransactions = subscribeToTransactions(
+      (data) => {
+        setTransactions(data)
+        setLoading(false)
+      },
+      (error) => {
+        setLoadError(error.message || 'Failed to load transactions.')
+        setLoading(false)
+      },
+    )
+    const unsubscribeCategories = subscribeToCategories(setCategories, (error) => {
+      setLoadError(error.message || 'Failed to load categories.')
     })
-    const unsubscribeCategories = subscribeToCategories(setCategories)
 
     return () => {
       unsubscribeTransactions()
@@ -119,6 +128,12 @@ export function DashboardPage() {
         <h1 className="text-2xl font-bold text-brand-black">Dashboard</h1>
         <p className="text-sm text-neutral-500">Overview for the current month at a glance.</p>
       </div>
+
+      {loadError && (
+        <div className="rounded-lg border border-brand-red bg-brand-red-light px-4 py-3">
+          <p className="text-sm font-medium text-brand-red">{loadError}</p>
+        </div>
+      )}
 
       <SnapshotCards totalInflow={totalInflow} totalOutflow={totalOutflow} net={net} />
 

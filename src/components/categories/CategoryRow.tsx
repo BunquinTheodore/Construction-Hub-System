@@ -15,6 +15,7 @@ export function CategoryRow({ category }: CategoryRowProps) {
   const [name, setName] = useState(category.name)
   const [confirmingArchive, setConfirmingArchive] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [actionError, setActionError] = useState('')
 
   async function saveRename() {
     const trimmed = name.trim()
@@ -44,9 +45,12 @@ export function CategoryRow({ category }: CategoryRowProps) {
 
   async function handleArchive() {
     setBusy(true)
+    setActionError('')
     try {
       await archiveCategory(category.id)
       setConfirmingArchive(false)
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to archive category.')
     } finally {
       setBusy(false)
     }
@@ -54,8 +58,11 @@ export function CategoryRow({ category }: CategoryRowProps) {
 
   async function handleRestore() {
     setBusy(true)
+    setActionError('')
     try {
       await updateCategory(category.id, { active: true })
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to restore category.')
     } finally {
       setBusy(false)
     }
@@ -63,24 +70,35 @@ export function CategoryRow({ category }: CategoryRowProps) {
 
   if (confirmingArchive) {
     return (
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand-red-light bg-brand-red-light/40 px-4 py-3">
-        <span className="text-sm font-medium text-brand-black">
-          Archive "{category.name}"? It will disappear from the transaction form.
-        </span>
-        <div className="flex gap-2">
-          <Button variant="danger" onClick={handleArchive} disabled={busy}>
-            Archive
-          </Button>
-          <Button variant="secondary" onClick={() => setConfirmingArchive(false)} disabled={busy}>
-            Cancel
-          </Button>
+      <div className="flex flex-col gap-2 rounded-lg border border-brand-red-light bg-brand-red-light/40 px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="text-sm font-medium text-brand-black">
+            Archive "{category.name}"? It will disappear from the transaction form.
+          </span>
+          <div className="flex gap-2">
+            <Button variant="danger" onClick={handleArchive} disabled={busy}>
+              Archive
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setConfirmingArchive(false)
+                setActionError('')
+              }}
+              disabled={busy}
+            >
+              Cancel
+            </Button>
+          </div>
         </div>
+        {actionError && <span className="text-xs font-medium text-brand-red">{actionError}</span>}
       </div>
     )
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-brand-border px-4 py-3">
+    <div className="flex flex-col gap-1.5 rounded-lg border border-brand-border px-4 py-3">
+      <div className="flex items-center justify-between gap-3">
       {editing ? (
         <div className="flex flex-1 items-center gap-2">
           <Input
@@ -144,6 +162,8 @@ export function CategoryRow({ category }: CategoryRowProps) {
           )}
         </div>
       )}
+      </div>
+      {actionError && <span className="text-xs font-medium text-brand-red">{actionError}</span>}
     </div>
   )
 }

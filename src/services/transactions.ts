@@ -15,11 +15,18 @@ import type { NewTransaction, Transaction } from '../types'
 
 const transactionsRef = collection(db, 'transactions')
 
-export function subscribeToTransactions(callback: (transactions: Transaction[]) => void) {
+export function subscribeToTransactions(
+  callback: (transactions: Transaction[]) => void,
+  onError?: (error: Error) => void,
+) {
   const q = query(transactionsRef, orderBy('date', 'desc'), orderBy('createdAt', 'desc'))
-  return onSnapshot(q, (snapshot) => {
-    callback(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Transaction))
-  })
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      callback(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Transaction))
+    },
+    (error) => onError?.(error),
+  )
 }
 
 export async function createTransaction(transaction: NewTransaction): Promise<string> {

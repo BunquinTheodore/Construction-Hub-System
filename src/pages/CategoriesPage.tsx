@@ -11,12 +11,19 @@ export function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loaded, setLoaded] = useState(false)
   const [seeding, setSeeding] = useState(false)
+  const [loadError, setLoadError] = useState('')
 
   useEffect(() => {
-    const unsubscribe = subscribeToCategories((data) => {
-      setCategories(data)
-      setLoaded(true)
-    })
+    const unsubscribe = subscribeToCategories(
+      (data) => {
+        setCategories(data)
+        setLoaded(true)
+      },
+      (error) => {
+        setLoadError(error.message || 'Failed to load categories.')
+        setLoaded(true)
+      },
+    )
     return unsubscribe
   }, [])
 
@@ -48,6 +55,12 @@ export function CategoriesPage() {
           Manage the inflow and outflow categories used across transactions and summaries.
         </p>
       </div>
+
+      {loadError && (
+        <Card className="border-brand-red bg-brand-red-light">
+          <p className="text-sm font-medium text-brand-red">{loadError}</p>
+        </Card>
+      )}
 
       <Card>
         <h2 className="mb-4 text-base font-semibold text-brand-black">Add Category</h2>
